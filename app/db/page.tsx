@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface DonorFormData {
   nik: string;
@@ -45,6 +45,13 @@ export default function InputDataPendonorPage() {
     catatan: '',
     alamat: '',
   });
+
+  useEffect(() => {
+    router.prefetch('/screening');
+    router.prefetch('/dashboard');
+    router.prefetch('/aftap');
+    router.prefetch('/login');
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -127,13 +134,13 @@ export default function InputDataPendonorPage() {
           />
         </div>
         <div className="nav-links">
-          <Link href="/dashboard" className="nav-item">
+          <Link href="/dashboard" prefetch={true} className="nav-item">
             Dashboard
           </Link>
-          <Link href="/db" className="nav-item active">
+          <Link href="/db" prefetch={true} className="nav-item active">
             Data Pendonor
           </Link>
-          <Link href="/screening" className="nav-item">
+          <Link href="/screening" prefetch={true} className="nav-item">
             Laporan Insiden 
           </Link>
         </div>

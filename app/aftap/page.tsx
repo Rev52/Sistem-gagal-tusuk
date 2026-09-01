@@ -58,7 +58,12 @@ export default function AftapPage() {
         console.error(e);
       }
     }
-  }, []);
+
+    router.prefetch('/dashboard');
+    router.prefetch('/db');
+    router.prefetch('/screening');
+    router.prefetch('/login');
+  }, [router]);
 
   const handleSaveAftap = () => {
     if (!petugas.trim()) {
@@ -131,13 +136,13 @@ export default function AftapPage() {
           />
         </div>
         <div className="nav-links">
-          <Link href="/dashboard" className="nav-item">
+          <Link href="/dashboard" prefetch={true} className="nav-item">
             Dashboard
           </Link>
-          <Link href="/db" className="nav-item">
+          <Link href="/db" prefetch={true} className="nav-item">
             Data Pendonor
           </Link>
-          <Link href="/aftap" className="nav-item active">
+          <Link href="/aftap" prefetch={true} className="nav-item active">
             Aftap
           </Link>
         </div>

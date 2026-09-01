@@ -44,7 +44,14 @@ export default function DashboardPage() {
     } catch (e) {
       console.error("Storage error:", e);
     }
-  }, []);
+
+    // Prefetch connected routes for instant transitions
+    router.prefetch('/db');
+    router.prefetch('/screening');
+    router.prefetch('/aftap');
+    router.prefetch('/edit');
+    router.prefetch('/login');
+  }, [router]);
 
   const saveMasterData = (newData: DonorItem[]) => {
     setMasterData(newData);
@@ -192,13 +199,13 @@ export default function DashboardPage() {
           />
         </div>
         <div className="nav-links">
-          <Link href="/dashboard" className="nav-item active">
+          <Link href="/dashboard" prefetch={true} className="nav-item active">
             Dashboard
           </Link>
-          <Link href="/db" className="nav-item">
+          <Link href="/db" prefetch={true} className="nav-item">
             Data Pendonor
           </Link>
-          <Link href="/screening" className="nav-item">
+          <Link href="/screening" prefetch={true} className="nav-item">
             Laporan Insiden
           </Link>
         </div>

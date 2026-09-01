@@ -138,7 +138,11 @@ function EditDonorContent() {
         }
       }
     }
-  }, [idParam]);
+
+    // Prefetch return routes
+    router.prefetch('/dashboard');
+    router.prefetch('/db');
+  }, [idParam, router]);
 
   const handleSave = () => {
     alert(`Berhasil! Perubahan data rekam medis untuk "${donor.nama}" telah disimpan ke sistem.`);
@@ -160,7 +164,7 @@ function EditDonorContent() {
         </div>
         <div>
           <div className="sub-title">Unit Transfusi Darah PMI Kota Pasuruan</div>
-          <Link href="/dashboard" className="btn-back">
+          <Link href="/dashboard" prefetch={true} className="btn-back">
             <i className="fas fa-arrow-left"></i> Kembali ke Dashboard
           </Link>
         </div>

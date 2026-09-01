@@ -18,6 +18,32 @@ export default function LandingPage() {
     setFailedImages((prev) => ({ ...prev, [index]: true }));
   };
 
+
+  const bannerData: BannerItem[] = [
+    {
+      src: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=1000&q=80',
+      alt: 'Pelayanan Donor Darah UTD PMI',
+      fallback: '[ Dokumentasi 1: Pelayanan Donor ]',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1000&q=80',
+      alt: 'Pemeriksaan Kesehatan & Screening Medis',
+      fallback: '[ Dokumentasi 2: Screening Medis ]',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1000&q=80',
+      alt: 'Tindakan Aftap & Laboratorium Darah',
+      fallback: '[ Dokumentasi 3: Tindakan Aftap ]',
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1000&q=80',
+      alt: 'Edukasi dan Evaluasi Keselamatan Donor',
+      fallback: '[ Dokumentasi 4: Evaluasi Keselamatan ]',
+    },
+  ];
+
+  const [activeSlide, setActiveSlide] = useState<number>(0);
+
   useEffect(() => {
     // 1. Scroll Progress & Back to Top Toggle
     const handleScroll = () => {
@@ -30,7 +56,7 @@ export default function LandingPage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // 2. Intersection Observer for Scroll-Reveal Animation (Up & Down)
+    // 2. Intersection Observer for Scroll-Reveal Animation
     const observerCallback: IntersectionObserverCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -47,11 +73,23 @@ export default function LandingPage() {
     const elements = document.querySelectorAll('.scroll-reveal');
     elements.forEach((el) => observer.observe(el));
 
+    // 3. Preload all banner images immediately into browser cache
+    bannerData.forEach((item) => {
+      const img = new window.Image();
+      img.src = item.src;
+    });
+
+    // 4. Auto-advance slide smoothly every 4 seconds
+    const slideTimer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % bannerData.length);
+    }, 4000);
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
+      clearInterval(slideTimer);
     };
-  }, []);
+  }, [bannerData]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -60,28 +98,13 @@ export default function LandingPage() {
     });
   };
 
-  const bannerData: BannerItem[] = [
-    {
-      src: 'https://i.pinimg.com/736x/69/e4/10/69e4108c93faf43faa209340d3903730.jpg',
-      alt: 'Dokumentasi 1',
-      fallback: '[ Foto 1 ]',
-    },
-    {
-      src: 'https://i.pinimg.com/736x/32/39/bc/3239bcbc602c33e09c683daded41264d.jpg',
-      alt: 'Dokumentasi 2',
-      fallback: '[ Foto 2 ]',
-    },
-    {
-      src: 'https://i.pinimg.com/1200x/08/44/91/0844918b91620c7d33f449202a8dd0c4.jpg',
-      alt: 'Dokumentasi 3',
-      fallback: '[ Foto 3 ]',
-    },
-    {
-      src: 'https://i.pinimg.com/736x/f3/d7/77/f3d777773e971868747becc7b97e59c1.jpg',
-      alt: 'Dokumentasi 4',
-      fallback: '[ Foto 4 ]',
-    },
-  ];
+  const nextSlide = () => {
+    setActiveSlide((prev) => (prev + 1) % bannerData.length);
+  };
+
+  const prevSlide = () => {
+    setActiveSlide((prev) => (prev - 1 + bannerData.length) % bannerData.length);
+  };
 
   return (
     <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', position: 'relative' }}>
@@ -115,6 +138,7 @@ export default function LandingPage() {
               src="https://upload.wikimedia.org/wikipedia/id/6/65/Pmi.png"
               alt="Logo PMI"
               className="hero-logo-img"
+              loading="eager"
             />
           </div>
         </div>
@@ -126,32 +150,74 @@ export default function LandingPage() {
         </p>
 
         <div className="btn-container">
-          <Link href="/login" className="btn-hero">
+          <Link href="/login" prefetch={true} className="btn-hero">
             Log In
           </Link>
-          <Link href="/signin" className="btn-hero">
+          <Link href="/signin" prefetch={true} className="btn-hero">
             Sign In
           </Link>
         </div>
       </header>
 
-      {/* 2. BANNER DOKUMENTASI */}
-      <div className="banner-container scroll-reveal">
-        {bannerData.map((item, idx) => (
-          <div key={idx} className="banner-box">
-            {!failedImages[idx] ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={item.src}
-                alt={item.alt}
-                className="banner-img"
-                onError={() => handleImageError(idx)}
-              />
-            ) : (
-              <div className="banner-fallback">{item.fallback}</div>
-            )}
+      {/* 2. BANNER DOKUMENTASI DENGAN SLIDER INSTAN & RESPONSIVE */}
+      <div className="banner-slider-wrapper scroll-reveal">
+        <div className="banner-slider-container">
+          <div
+            className="banner-track"
+            style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+          >
+            {bannerData.map((item, idx) => (
+              <div key={idx} className="banner-slide">
+                {!failedImages[idx] ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    className="banner-img"
+                    loading="eager"
+                    onError={() => handleImageError(idx)}
+                  />
+                ) : (
+                  <div className="banner-fallback">{item.fallback}</div>
+                )}
+                <div className="banner-caption">
+                  <span>{item.alt}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+
+          {/* Slider Navigation Arrows */}
+          <button
+            onClick={prevSlide}
+            className="slider-arrow slider-arrow-left"
+            aria-label="Slide sebelumnya"
+            type="button"
+          >
+            ❮
+          </button>
+          <button
+            onClick={nextSlide}
+            className="slider-arrow slider-arrow-right"
+            aria-label="Slide berikutnya"
+            type="button"
+          >
+            ❯
+          </button>
+
+          {/* Slider Indicator Dots */}
+          <div className="slider-dots">
+            {bannerData.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveSlide(idx)}
+                className={`slider-dot ${activeSlide === idx ? 'active' : ''}`}
+                aria-label={`Pindah ke slide ${idx + 1}`}
+                type="button"
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 3. LAYANAN MONITORING */}

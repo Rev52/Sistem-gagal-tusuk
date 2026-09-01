@@ -72,7 +72,12 @@ export default function ScreeningPage() {
         console.error(e);
       }
     }
-  }, []);
+
+    router.prefetch('/aftap');
+    router.prefetch('/dashboard');
+    router.prefetch('/db');
+    router.prefetch('/login');
+  }, [router]);
 
   const handleDemoFill = () => {
     setDonor({
@@ -177,13 +182,13 @@ export default function ScreeningPage() {
           />
         </div>
         <div className="nav-links">
-          <Link href="/dashboard" className="nav-item">
+          <Link href="/dashboard" prefetch={true} className="nav-item">
             Dashboard
           </Link>
-          <Link href="/db" className="nav-item">
+          <Link href="/db" prefetch={true} className="nav-item">
             Data Pendonor
           </Link>
-          <Link href="/screening" className="nav-item active">
+          <Link href="/screening" prefetch={true} className="nav-item active">
             Screening
           </Link>
         </div>

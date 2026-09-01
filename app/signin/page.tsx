@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function SigninPage() {
   const router = useRouter();
@@ -10,6 +10,11 @@ export default function SigninPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+  useEffect(() => {
+    router.prefetch('/login');
+    router.prefetch('/');
+  }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +55,7 @@ export default function SigninPage() {
               placeholder="Nama"
               className="form-control"
               value={nama}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setNama(e.target.value)}
               required
             />
           </div>
